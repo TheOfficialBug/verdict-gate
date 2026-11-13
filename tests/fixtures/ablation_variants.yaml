@@ -1,0 +1,27 @@
+# Policy variants replayed side by side by `verdict-gate replay --ablations` (test fixture).
+# Policy paths are relative to the policy root and fall back to the policies bundled with the package.
+name: e3a
+version: 2
+base_policy: configs/policies/moderate.yaml
+variants:
+  - {name: naive, policy: configs/policies/naive.yaml}
+  - {name: fixed_repeat, policy: configs/policies/fixed_repeat.yaml}
+  - {name: moderate}
+  - {name: strict, policy: configs/policies/strict.yaml}
+  - {name: accept_all, method: accept_all}             # reference: every candidate PASS_GLOBAL
+                                                       # (EvoSkill v2-style, no admission control; arXiv:2610.25931 §6.4)
+  - {name: reject_all, method: reject_all}             # reference: every candidate UNSUPPORTED
+  # regression-bounded gate (keep if higher and few regressions)
+  # SkillOpt's strict keep-if-higher rule is the naive row above.
+  - {name: skillboost_gate, method: regression_bounded, policy: configs/policies/naive.yaml, eps: 0.05}
+  - {name: skillboost_gate_3seed, method: regression_bounded, policy: configs/policies/fixed_repeat.yaml,
+     eps: 0.05}                                        # our extension: same gate on 3-seed majority labels
+  - {name: no_floor, floor: zero}                       # t = 0
+  - {name: legacy_floor, floor: legacy}                 # F_legacy at every n instead of paired F_noise(n)
+  - {name: no_early_stop, early_stop: false}            # always n = max_n
+  - {name: block_4, overrides: {block_size: 4}}
+  - {name: block_16, overrides: {block_size: 16}}
+  - {name: orderings, order_seeds: {start: 7002, count: 20}}   # 20 alternative block orderings
+  - {name: holm_sign_flip, method: holm_sign_flip, alpha: 0.05, n_perm: 100000, rng_seed: 8001}
+  - {name: dirichlet_multinomial, method: dirichlet_multinomial, draws: 10000, rng_seed: 9001,
+     p_pass: 0.95, p_harm: 0.95}

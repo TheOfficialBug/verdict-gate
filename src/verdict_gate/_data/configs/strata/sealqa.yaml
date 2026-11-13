@@ -1,0 +1,6 @@
+# The only grouping field that conditional decisions, subgroup harm/support and routing may use (D11, 2026-11-03).
+# question_types and topic are descriptive tags only: reported, never used for decisions or routing.
+name: sealqa
+version: 1
+field: freshness
+levels: [never-changing, slow-changing, fast-changing]

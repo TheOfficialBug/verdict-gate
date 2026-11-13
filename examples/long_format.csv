@@ -1,0 +1,8 @@
+run_id,task_id,seed,score,valid,stratum,model,provider,revision_id,failure_type,retry_of,tokens_in,tokens_out,tool_calls,latency_s,cost_usd
+parent_s11,q001,11,1,true,never-changing,my-model,my-provider,parent,,,1200,80,3,4.2,0.0004
+parent_s11,q002,11,0,true,fast-changing,my-model,my-provider,parent,,,1500,95,4,5.0,0.0005
+parent_s11,q003,11,,false,slow-changing,my-model,my-provider,parent,timeout,,,,,,
+parent_s11,q003,11,1,true,slow-changing,my-model,my-provider,parent,,parent_s11/q003,1100,70,2,3.9,0.0004
+candidate_s11,q001,11,1,true,never-changing,my-model,my-provider,cand-1,,,1250,85,3,4.4,0.0004
+candidate_s11,q002,11,1,true,fast-changing,my-model,my-provider,cand-1,,,1400,90,3,4.8,0.0005
+candidate_s11,q003,11,0,true,slow-changing,my-model,my-provider,cand-1,,,1300,88,3,4.1,0.0004

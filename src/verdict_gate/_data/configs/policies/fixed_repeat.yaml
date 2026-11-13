@@ -1,0 +1,5 @@
+name: fixed_repeat
+version: 1
+kind: fixed_repeat
+seeds: [11, 22, 33]
+floor: {source: legacy_fnoise, file: "configs/fnoise/{model_slug}.yaml"}

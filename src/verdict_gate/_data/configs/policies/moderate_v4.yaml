@@ -1,0 +1,20 @@
+name: moderate
+version: 4   # v4 (2026-11-13, D139; unreleased, not part of prereg-v1): v3 + evidence_gate + max_n 120.
+             # Fixed BEFORE the decision benchmark and before E23 (Kunal: "have this change ready"). Why: with a
+             # near-deterministic agent F_noise(n) = 0 and v3 decided on the first block of 8 (E21/E22, D138).
+             # min_n 32 = four blocks; min_discordant 6 = the fewest discordant pairs at which an exact one-sided sign
+             # test can reach p < 0.05 (6 of 6: p = 0.016); max_n 120 = 2 x v3, so a ~5-point effect at ~10%
+             # discordance can gather ~12 discordant pairs (still <= 40% of a 300-question held set).
+kind: sequential_bayes
+block_size: 8
+max_n: 120
+order_seed: 7001
+posterior: {method: bayes_bootstrap, draws: 10000, rng_seed: 9001}
+floor: {source: paired_fnoise, file: "configs/fnoise/{model_slug}.yaml"}
+pass:       {p_gain_gt_0: 0.95, p_gain_gt_floor: 0.50}
+futility:   {p_gain_gt_0_max: 0.05, p_gain_gt_floor_max: 0.10, hold_while_negative: true}
+harm:       {p_gain_lt_neg_floor: 0.95, max_cost_ratio: 2.0}
+subgroup:   {strata_file: configs/strata/sealqa.yaml, harm_min_n: 8, harm_p_lt_neg_floor: 0.90,
+             support_min_n: 16}
+curtailment: true
+evidence_gate: {min_n: 32, min_discordant: 6}

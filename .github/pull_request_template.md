@@ -1,0 +1,4 @@
+- [ ] Tests added or updated; `uv run pytest -q` and `uv run ruff check src tests examples` pass
+- [ ] `CHANGELOG.md` updated under "Unreleased"
+- [ ] No bundled policy file edited in place (add a new versioned policy instead)
+- [ ] Any reported result states its denominator and whether it is pre-registered or post hoc

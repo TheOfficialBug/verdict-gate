@@ -1,0 +1,42 @@
+[
+ {
+  "revision_id": "c_good",
+  "decision": "PASS_GLOBAL",
+  "sequential": {
+   "questions_used": 8,
+   "blocks_evaluated": 1
+  }
+ },
+ {
+  "revision_id": "c_bad",
+  "decision": "HARMFUL",
+  "sequential": {
+   "questions_used": 8,
+   "blocks_evaluated": 1
+  }
+ },
+ {
+  "revision_id": "c_null",
+  "decision": "UNSUPPORTED",
+  "sequential": {
+   "questions_used": 8,
+   "blocks_evaluated": 1
+  }
+ },
+ {
+  "revision_id": "c_costly",
+  "decision": "HARMFUL",
+  "sequential": {
+   "questions_used": 8,
+   "blocks_evaluated": 1
+  }
+ },
+ {
+  "revision_id": "c_mixed",
+  "decision": "UNSUPPORTED",
+  "sequential": {
+   "questions_used": 24,
+   "blocks_evaluated": 3
+  }
+ }
+]

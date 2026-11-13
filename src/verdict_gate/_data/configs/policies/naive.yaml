@@ -1,0 +1,4 @@
+name: naive
+version: 1
+kind: keep_if_higher
+seed: 11

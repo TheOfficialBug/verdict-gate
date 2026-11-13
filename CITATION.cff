@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use VERDICT, please cite it as below."
+title: "VERDICT: Evidence-governed keep/reject decisions for changes to LLM agents"
+type: software
+authors:
+  - family-names: Suresh
+    given-names: Kunal
+    affiliation: Iowa State University
+license: Apache-2.0
+repository-code: "https://github.com/TheOfficialBug/verdict-gate"
+url: "https://github.com/TheOfficialBug/verdict-gate"
+keywords:
+  - LLM agents
+  - evaluation
+  - self-improvement
+  - sequential testing
+  - noise floor

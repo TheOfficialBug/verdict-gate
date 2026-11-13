@@ -1,0 +1,238 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "verdict.evidence_card/1.1",
+  "title": "VERDICT evidence card",
+  "description": "IMPLEMENTATION_SPEC §E. Every field is required; null only where the type allows it. 1.1 (2026-11-03): scope.domains_tested and the activation rule (domain conditions only for supported tested domains; parent_fallback always holds the untested-domain catch-all). Cross-field parts of the rule are checked by verdict.core.evidence_card.scope_errors.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "card_version", "created_at", "git_commit", "prereg_tag",
+    "revision_id", "parent_id", "revision_type", "revision_text_hash",
+    "evaluation_context", "policy", "noise_calibration", "effect", "transitions", "scope", "models", "costs",
+    "sequential", "decision", "decision_reason", "activation_conditions", "inhibition_conditions",
+    "parent_fallback", "held_out_replication", "source_run_ids", "preliminary"
+  ],
+  "$defs": {
+    "prob": {"type": "number", "minimum": 0, "maximum": 1},
+    "prob_or_null": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+    "count": {"type": "integer", "minimum": 0},
+    "usd_or_null": {"type": ["number", "null"], "minimum": 0},
+    "levels": {"type": "array", "items": {"type": "string"}},
+    "condition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "level"],
+      "properties": {"field": {"type": "string"}, "level": {"type": ["string", "null"]}}
+    },
+    "conditions": {"type": "array", "items": {"$ref": "#/$defs/condition"}},
+    "stratum": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "level", "n", "delta_hat", "floor", "p_gain_gt_0", "p_gain_gt_floor", "p_gain_lt_0",
+                   "repairs", "regressions", "label"],
+      "properties": {
+        "field": {"type": "string"},
+        "level": {"type": "string"},
+        "n": {"$ref": "#/$defs/count"},
+        "delta_hat": {"type": ["number", "null"], "minimum": -1, "maximum": 1},
+        "floor": {"type": ["number", "null"], "minimum": 0},
+        "p_gain_gt_0": {"$ref": "#/$defs/prob_or_null"},
+        "p_gain_gt_floor": {"$ref": "#/$defs/prob_or_null"},
+        "p_gain_lt_0": {"$ref": "#/$defs/prob_or_null"},
+        "p_gain_lt_neg_floor": {"$ref": "#/$defs/prob_or_null"},
+        "repairs": {"$ref": "#/$defs/count"},
+        "regressions": {"$ref": "#/$defs/count"},
+        "label": {"enum": ["supported", "inconclusive", "harmful"]}
+      }
+    },
+    "domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["domain", "role", "benchmark", "split", "n", "seeds", "effect", "label", "run_ids"],
+      "properties": {
+        "domain": {"type": "string", "minLength": 1},
+        "role": {"enum": ["primary", "transfer"]},
+        "benchmark": {"type": "string", "minLength": 1},
+        "split": {"type": "string", "minLength": 1},
+        "n": {"type": "integer", "minimum": 1},
+        "seeds": {"type": "array", "minItems": 1, "items": {"type": ["integer", "null"]}},
+        "effect": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["delta_hat", "floor", "posterior_method", "rng_seed", "p_gain_gt_0", "p_gain_gt_floor",
+                       "p_gain_lt_0", "p_gain_lt_neg_floor", "ci95"],
+          "properties": {
+            "delta_hat": {"type": "number", "minimum": -1, "maximum": 1},
+            "floor": {"type": ["number", "null"], "minimum": 0},
+            "posterior_method": {"enum": ["bayes_bootstrap"]},
+            "rng_seed": {"type": "integer"},
+            "p_gain_gt_0": {"$ref": "#/$defs/prob"},
+            "p_gain_gt_floor": {"$ref": "#/$defs/prob_or_null"},
+            "p_gain_lt_0": {"$ref": "#/$defs/prob"},
+            "p_gain_lt_neg_floor": {"$ref": "#/$defs/prob_or_null"},
+            "ci95": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}}
+          }
+        },
+        "label": {"enum": ["supported", "inconclusive", "harmful"]},
+        "run_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+      }
+    }
+  },
+  "properties": {
+    "card_version": {"const": "verdict.evidence_card/1.1"},
+    "created_at": {"type": "string", "minLength": 1},
+    "git_commit": {"type": "string", "minLength": 1},
+    "prereg_tag": {"type": ["string", "null"]},
+    "revision_id": {"type": "string", "minLength": 1},
+    "parent_id": {"type": "string", "minLength": 1},
+    "revision_type": {"enum": ["skill", "prompt", "model", "tool", "retrieval", "memory_rule", "router",
+                               "agent_graph", "done_condition_checker"]},
+    "revision_text_hash": {"type": "string", "minLength": 1},
+    "evaluation_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["benchmark", "split", "model", "provider", "seeds", "retrieval_cache_version", "max_tokens"],
+      "properties": {
+        "benchmark": {"type": "string"},
+        "split": {"type": "string"},
+        "model": {"type": "string"},
+        "provider": {"type": "string"},
+        "seeds": {"type": "array", "minItems": 1, "items": {"type": ["integer", "null"]}},
+        "retrieval_cache_version": {"type": ["string", "null"]},
+        "max_tokens": {"type": "integer", "minimum": 1}
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "config_hash"],
+      "properties": {
+        "name": {"type": "string"},
+        "version": {"type": "integer"},
+        "config_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "noise_calibration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["floor_type", "floor_value_at_n", "fnoise_file_hash", "source_run_ids"],
+      "properties": {
+        "floor_type": {"enum": ["paired_fnoise", "legacy_fnoise", "none"]},
+        "floor_value_at_n": {"type": ["number", "null"], "minimum": 0},
+        "fnoise_file_hash": {"type": ["string", "null"]},
+        "source_run_ids": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "effect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["n", "delta_hat", "posterior_method", "rng_seed", "p_gain_gt_0", "p_gain_gt_floor",
+                   "p_gain_lt_0", "ci95"],
+      "properties": {
+        "n": {"type": "integer", "minimum": 1},
+        "delta_hat": {"type": "number", "minimum": -1, "maximum": 1},
+        "posterior_method": {"enum": ["bayes_bootstrap"]},
+        "rng_seed": {"type": "integer"},
+        "p_gain_gt_0": {"$ref": "#/$defs/prob"},
+        "p_gain_gt_floor": {"$ref": "#/$defs/prob_or_null"},
+        "p_gain_lt_0": {"$ref": "#/$defs/prob"},
+        "p_gain_lt_neg_floor": {"$ref": "#/$defs/prob_or_null"},
+        "ci95": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}}
+      }
+    },
+    "transitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repairs", "regressions", "preserved", "unresolved", "unstable", "conditional_regression_rate"],
+      "properties": {
+        "repairs": {"$ref": "#/$defs/count"},
+        "regressions": {"$ref": "#/$defs/count"},
+        "preserved": {"$ref": "#/$defs/count"},
+        "unresolved": {"$ref": "#/$defs/count"},
+        "unstable": {"$ref": "#/$defs/count"},
+        "conditional_regression_rate": {"$ref": "#/$defs/prob_or_null"}
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strata", "supported", "inconclusive", "harmed", "domains_tested"],
+      "properties": {
+        "strata": {"type": "array", "items": {"$ref": "#/$defs/stratum"}},
+        "supported": {"$ref": "#/$defs/levels"},
+        "inconclusive": {"$ref": "#/$defs/levels"},
+        "harmed": {"$ref": "#/$defs/levels"},
+        "domains_tested": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/domain"}}
+      }
+    },
+    "models": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["supported", "inconclusive", "harmed"],
+      "properties": {
+        "supported": {"$ref": "#/$defs/levels"},
+        "inconclusive": {"$ref": "#/$defs/levels"},
+        "harmed": {"$ref": "#/$defs/levels"}
+      }
+    },
+    "costs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parent_usd_per_q", "candidate_usd_per_q", "cost_ratio", "line_items"],
+      "properties": {
+        "parent_usd_per_q": {"$ref": "#/$defs/usd_or_null"},
+        "candidate_usd_per_q": {"$ref": "#/$defs/usd_or_null"},
+        "cost_ratio": {"$ref": "#/$defs/usd_or_null"},
+        "line_items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["parent", "candidate"],
+          "properties": {
+            "parent": {"type": "object", "additionalProperties": {"type": "number"}},
+            "candidate": {"type": "object", "additionalProperties": {"type": "number"}}
+          }
+        }
+      }
+    },
+    "sequential": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["blocks_evaluated", "questions_used", "stopping_reason"],
+      "properties": {
+        "blocks_evaluated": {"type": "integer", "minimum": 1},
+        "questions_used": {"type": "integer", "minimum": 1},
+        "stopping_reason": {"type": "string", "minLength": 1}
+      }
+    },
+    "decision": {"enum": ["PASS_GLOBAL", "PASS_CONDITIONAL", "NEEDS_MORE_EVIDENCE", "UNSUPPORTED", "HARMFUL"]},
+    "decision_reason": {"type": "string", "minLength": 1},
+    "activation_conditions": {"$ref": "#/$defs/conditions"},
+    "inhibition_conditions": {"$ref": "#/$defs/conditions"},
+    "parent_fallback": {
+      "allOf": [{"$ref": "#/$defs/conditions"}],
+      "contains": {"const": {"field": "domain", "level": null}}
+    },
+    "held_out_replication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "run_ids"],
+      "properties": {
+        "status": {"enum": ["pending", "verified", "not_verified", "worse", "not_applicable"]},
+        "run_ids": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "source_run_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "preliminary": {"type": "boolean"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"decision": {"const": "PASS_CONDITIONAL"}}},
+      "then": {
+        "properties": {
+          "activation_conditions": {"minItems": 1},
+          "parent_fallback": {"minItems": 1}
+        }
+      }
+    }
+  ]
+}

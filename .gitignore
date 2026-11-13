@@ -1,0 +1,21 @@
+__pycache__/
+*.py[cod]
+.venv/
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.DS_Store
+.idea/
+.vscode/
+# local outputs of the examples
+demo/
+verdict_example/
+card.json
+card.md
+floor.yaml
+parent.json
+candidate.json

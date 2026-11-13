@@ -1,0 +1,85 @@
+[project]
+name = "verdict-gate"
+version = "0.3.0.dev0"
+description = "Evidence-governed keep/reject decisions for changes to LLM agents (research preview)"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+# 3.12+: the code uses PEP 695-era typing and `datetime.UTC`; NumPy >= 2.1 and Pydantic 2 are tested on 3.12 and 3.13.
+requires-python = ">=3.12"
+authors = [{ name = "Kunal Suresh" }]
+keywords = [
+    "llm", "agents", "evaluation", "self-improvement", "a/b testing", "bayesian", "sequential testing",
+    "regression testing", "prompt engineering", "noise floor", "paired comparison", "evidence",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Testing",
+    "Typing :: Typed",
+]
+# Tested compatibility window (CI runs both the lowest and the newest allowed versions).
+dependencies = [
+    "jsonschema>=4.23,<5",
+    "numpy>=2.1,<3",
+    "pydantic>=2.10,<3",
+    "pyyaml>=6.0.2,<7",
+    "typer>=0.15,<1",
+]
+
+[project.urls]
+Homepage = "https://github.com/TheOfficialBug/verdict-gate"
+Documentation = "https://github.com/TheOfficialBug/verdict-gate/tree/main/docs"
+Repository = "https://github.com/TheOfficialBug/verdict-gate"
+Issues = "https://github.com/TheOfficialBug/verdict-gate/issues"
+Changelog = "https://github.com/TheOfficialBug/verdict-gate/blob/main/CHANGELOG.md"
+
+[project.scripts]
+verdict-gate = "verdict_gate.cli:app"
+vgate = "verdict_gate.cli:app"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.14.0",
+]
+
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/verdict_gate"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/verdict_gate", "tests", "examples", "docs", "/README.md", "/CHANGELOG.md", "/LICENSE",
+           "/CITATION.cff", "/SECURITY.md", "/CONTRIBUTING.md", "/conftest.py", "/pyproject.toml", "/uv.lock"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["F", "E", "W", "I", "B"]
+ignore = [
+    "E501",   # long lines: wrapped at 120 by hand, tables and log strings may run over
+    "E731",   # small lambdas are used on purpose in tests and replay shims
+    "E741",   # `l` = losses in the paired-outcome statistics (gains g, losses l, ties t), as in the literature
+    "B008",   # dataclass field defaults
+    "B905",   # zip(strict=...) would change behaviour of existing call sites
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["verdict_gate"]

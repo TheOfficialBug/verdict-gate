@@ -1,0 +1,15 @@
+name: strict
+version: 3   # v2 = Amendments A+B (2026-11-03): harm judged against −F_noise(n); pooled ±d floor
+             # v3 = Amendment A3 (2026-11-03): futility and curtailment held while Δ̂ < 0
+kind: sequential_bayes
+block_size: 8
+max_n: 60
+order_seed: 7001
+posterior: {method: bayes_bootstrap, draws: 10000, rng_seed: 9001}
+floor: {source: paired_fnoise, file: "configs/fnoise/{model_slug}.yaml"}
+pass:       {p_gain_gt_floor: 0.95}
+futility:   {p_gain_gt_0_max: 0.05, p_gain_gt_floor_max: 0.10, hold_while_negative: true}
+harm:       {p_gain_lt_neg_floor: 0.95, max_cost_ratio: 2.0}   # P(Δ < −F_noise(n)) ≥ 0.95
+subgroup:   {strata_file: configs/strata/sealqa.yaml, harm_min_n: 8, harm_p_lt_neg_floor: 0.90,
+             support_min_n: 16}
+curtailment: true
